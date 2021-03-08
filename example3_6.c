@@ -1,8 +1,19 @@
+#include <GL/freeglut_std.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 static int year = 0, day = 0;
+static GLdouble planet[8], moon[8];
+
+GLdouble double_rand( GLdouble min, GLdouble max )
+{
+    GLdouble scale = rand() / (GLdouble) RAND_MAX; /* [0, 1.0] */
+    return min + scale * ( max - min );      /* [min, max] */
+}
 
 void init(void) 
 {
@@ -12,30 +23,33 @@ void init(void)
 
 void display(void)
 {
-    glClear (GL_COLOR_BUFFER_BIT);
-    glColor3f (1.0, 1.0, 1.0);
+   glClear (GL_COLOR_BUFFER_BIT);
+   glColor3f (1.0, 1.0, 0.0);
 
-    glPushMatrix();
-    /* draw sun */
-    glutWireSphere(1.0, 20, 16);
-    glRotatef((GLfloat)year, 0.0, 1.0, 0.0);
-    /* draw smaller planet */
-    glTranslatef (2.0, 0.0, 0.0);
-    glRotatef ((GLfloat) day, 0.0, 1.0, 0.0);
-    glutWireSphere(0.2, 10, 8);
-    /* draw smaller moon */
-    glPushMatrix();
-    glTranslatef (0.5, 0.0, 0.0);
-    glRotatef ((GLfloat) day/2, 1.0, 1.0, 0.0);
-    glutWireSphere(0.1, 10, 8);
-    /* draw smaller moon */
-    glPopMatrix();
-    glTranslatef (0.0, 0.5, 0.0);
-    glRotatef ((GLfloat) day/2, 1.0, 1.0, 0.0);
-    glutWireSphere(0.1, 10, 8);
-    // Done
-    glPopMatrix();
-    glutSwapBuffers();
+   glPushMatrix(); // Sun Matrix
+   /* draw sun */
+   glutSolidSphere(1.0, 20, 16);
+   glRotatef((GLfloat)year, 1.0, 1.0, 1.0);
+   
+   glColor3f (1.0, 1.0, 1.0);
+   for (int i = 0; i < 3; i++) {
+     // Add planet
+      glTranslatef (2.5, 0.0, 0.0);
+      glPushMatrix(); // Planet Matrix
+      glRotatef((GLfloat)day, 0.0, 1.0, 0.0); // Rotates
+      
+      glutWireSphere(planet[i], 10, 8);
+      for (int j = 0; j < 2; j++) {
+         glTranslatef (0.3, 0.0, 0.0);
+         glPushMatrix(); // Moon Matrix
+         glutWireSphere(moon[j], 10, 8);
+         glPopMatrix();
+      }
+      glPopMatrix();
+   }
+
+   glPopMatrix();
+   glutSwapBuffers();
 }
 
 void reshape (int w, int h)
@@ -46,7 +60,7 @@ void reshape (int w, int h)
    gluPerspective(60.0, (GLfloat) w/(GLfloat) h, 1.0, 20.0);
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
-   gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+   gluLookAt (0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
 void keyboard (unsigned char key, int x, int y)
@@ -73,11 +87,18 @@ void keyboard (unsigned char key, int x, int y)
    }
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char **argv) {
+
+   srand((unsigned int)time(NULL));
+   for (int i = 0; i < 8; i++) {
+      // Add planet
+      planet[i] = double_rand(0.1, 0.3);
+      moon[i] = double_rand(0.01, 0.1);
+      printf("%f --- %f\n",moon[i], planet[i]);
+   }
    glutInit(&argc, argv);
    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
-   glutInitWindowSize (1080, 500); 
+   glutInitWindowSize (1200, 500); 
    glutInitWindowPosition (100, 100);
    glutCreateWindow (argv[0]);
    init ();
