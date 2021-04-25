@@ -36,11 +36,15 @@ void display(void)
      // Add planet
       glTranslatef (2.5, 0.0, 0.0);
       glPushMatrix(); // Planet Matrix
-      glRotatef((GLfloat)day, 0.0, 1.0, 0.0); // Rotates
+      glRotatef((GLfloat)day, 1.0, 0.0, 0.0); // Rotates
       
       glutWireSphere(planet[i], 10, 8);
-      for (int j = 0; j < 2; j++) {
-         glTranslatef (0.3, 0.0, 0.0);
+	  glPopMatrix();
+
+	  glPushMatrix();
+	  glRotatef((GLfloat)day, 1.0, 1.0, 0.0);  // Rotates
+	  for (int j = 0; j < 2; j++) {
+         glTranslatef (0.0, 0.0, 0.3);
          glPushMatrix(); // Moon Matrix
          glutWireSphere(moon[j], 10, 8);
          glPopMatrix();
@@ -92,13 +96,13 @@ int main(int argc, char **argv) {
    srand((unsigned int)time(NULL));
    for (int i = 0; i < 8; i++) {
       // Add planet
-      planet[i] = double_rand(0.1, 0.3);
+      planet[i] = double_rand(0.1, 0.5);
       moon[i] = double_rand(0.01, 0.1);
       printf("%f --- %f\n",moon[i], planet[i]);
    }
    glutInit(&argc, argv);
    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
-   glutInitWindowSize (1200, 500); 
+   glutInitWindowSize (500, 500); 
    glutInitWindowPosition (100, 100);
    glutCreateWindow (argv[0]);
    init ();
